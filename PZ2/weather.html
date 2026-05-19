@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Forecast</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #ffffff;
+            padding: 20px;
+        }
+
+        .weather-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            min-width: 320px;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .weather-card h2 {
+            margin-bottom: 25px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 12px 15px;
+            font-size: 1em;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 8px;
+            color: #333;
+            outline: none;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .search-box input:focus {
+            background: #ffffff;
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.4);
+        }
+
+        .search-box button {
+            padding: 12px 20px;
+            font-size: 1em;
+            font-weight: bold;
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8b);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .search-box button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+        }
+
+        .search-box button:active {
+            transform: translateY(0);
+        }
+
+        #city-title {
+            font-size: 1.4em;
+            margin-bottom: 20px;
+            font-weight: 500;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding-bottom: 10px;
+        }
+
+        .icon-container {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 15px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.4) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .weather-icon {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            filter: drop-shadow(0px 2px 3px rgba(0, 0, 0, 0.3));
+        }
+
+        .temp {
+            font-size: 3.5em;
+            font-weight: 700;
+            margin: 5px 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .desc {
+            font-size: 1.2M;
+            text-transform: capitalize;
+            letter-spacing: 0.5px;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+
+        .error-message {
+            background: rgba(255, 87, 87, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 87, 87, 0.4);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="weather-card">
+        <h2>🌤 Weather App</h2>
+        <div class="search-box">
+            <input type="text" id="city-input" placeholder="Search city..." value="Kharkiv">
+            <button id="search-btn">Find</button>
+        </div>
+
+        <h3 id="city-title">Weather in Kharkiv</h3>
+        <div id="weather-info">Loading data...</div>
+    </div>
+
+    <script>
+        const weatherCodeMap = {
+            0: { desc: 'Clear sky', icon: '01d' },
+            1: { desc: 'Mainly clear', icon: '02d' },
+            2: { desc: 'Partly cloudy', icon: '03d' },
+            3: { desc: 'Overcast', icon: '04d' },
+            45: { desc: 'Fog', icon: '50d' },
+            48: { desc: 'Depositing rime fog', icon: '50d' },
+            51: { desc: 'Light drizzle', icon: '09d' },
+            53: { desc: 'Moderate drizzle', icon: '09d' },
+            55: { desc: 'Dense drizzle', icon: '09d' },
+            56: { desc: 'Light freezing drizzle', icon: '09d' },
+            57: { desc: 'Dense freezing drizzle', icon: '09d' },
+            61: { desc: 'Slight rain', icon: '10d' },
+            63: { desc: 'Moderate rain', icon: '10d' },
+            65: { desc: 'Heavy rain', icon: '10d' },
+            66: { desc: 'Light freezing rain', icon: '13d' },
+            67: { desc: 'Heavy freezing rain', icon: '13d' },
+            71: { desc: 'Slight snow fall', icon: '13d' },
+            73: { desc: 'Moderate snow fall', icon: '13d' },
+            75: { desc: 'Heavy snow fall', icon: '13d' },
+            77: { desc: 'Snow grains', icon: '13d' },
+            80: { desc: 'Slight rain showers', icon: '09d' },
+            81: { desc: 'Moderate rain showers', icon: '09d' },
+            82: { desc: 'Violent rain showers', icon: '09d' },
+            85: { desc: 'Slight snow showers', icon: '13d' },
+            86: { desc: 'Heavy snow showers', icon: '13d' },
+            95: { desc: 'Thunderstorm', icon: '11d' },
+            96: { desc: 'Thunderstorm with light hail', icon: '11d' },
+            99: { desc: 'Thunderstorm with heavy hail', icon: '11d' }
+        };
+
+        function getWeather(city) {
+            const weatherInfo = document.getElementById('weather-info');
+            const cityTitle = document.getElementById('city-title');
+
+            weatherInfo.innerHTML = 'Loading data...';
+            const formattedCity = city.charAt(0).toUpperCase() + city.slice(1);
+            cityTitle.textContent = `Weather in ${formattedCity}`;
+
+            const geoUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=en&format=json`;
+
+            fetch(geoUrl)
+                .then(response => {
+                    if (!response.ok) throw new Error('Geocoding API error');
+                    return response.json();
+                })
+                .then(geoData => {
+                    if (!geoData.results || geoData.results.length === 0) {
+                        throw new Error('City not found');
+                    }
+
+                    const location = geoData.results[0];
+                    const lat = location.latitude;
+                    const lon = location.longitude;
+
+                    cityTitle.textContent = `Weather in ${location.name}, ${location.country}`;
+
+                    const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`;
+
+                    return fetch(weatherUrl);
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error('Weather API error');
+                    return response.json();
+                })
+                .then(weatherData => {
+                    const current = weatherData.current_weather;
+                    const temp = current.temperature;
+                    const code = current.weathercode;
+
+                    const weatherDetails = weatherCodeMap[code] || { desc: 'Unknown', icon: '03d' };
+                    let iconCode = weatherDetails.icon;
+                    if (current.is_day === 0 && iconCode.endsWith('d')) {
+                        iconCode = iconCode.replace('d', 'n');
+                    }
+
+                    const iconUrl = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
+
+                    weatherInfo.innerHTML = `
+                        <div class="icon-container">
+                            <img class="weather-icon" src="${iconUrl}" alt="${weatherDetails.desc}">
+                        </div>
+                        <div class="temp">${Math.round(temp)}°</div>
+                        <div class="desc">${weatherDetails.desc}</div>
+                    `;
+                })
+                .catch(error => {
+                    console.error('Fetch error:', error);
+                    weatherInfo.innerHTML = `
+                        <div class="error-message">
+                            <p style="font-weight: bold; margin-bottom: 5px;">Failed to load data!</p>
+                            <p style="font-size: 0.9em; opacity: 0.9;">Please check the city name.</p>
+                        </div>
+                    `;
+                });
+        }
+
+        document.getElementById('search-btn').addEventListener('click', () => {
+            const cityInput = document.getElementById('city-input').value.trim();
+            if (cityInput) {
+                getWeather(cityInput);
+            }
+        });
+
+        document.getElementById('city-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const cityInput = document.getElementById('city-input').value.trim();
+                if (cityInput) {
+                    getWeather(cityInput);
+                }
+            }
+        });
+
+        getWeather('Kharkiv');
+    </script>
+</body>
+
+</html>

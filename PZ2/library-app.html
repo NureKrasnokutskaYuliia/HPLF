@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Моя Бібліотека | Авторизація</title>
+
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .auth-container,
+        .app-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 100%;
+        }
+
+        .auth-container {
+            max-width: 450px;
+        }
+
+        .app-container {
+            max-width: 900px;
+        }
+
+        h1,
+        h2 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #444;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+
+        .btn-primary {
+            width: 100%;
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+
+        .btn-secondary {
+            background: #eee;
+            color: #555;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        .btn-secondary:hover {
+            background: #ddd;
+        }
+
+        .toggle-text {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+        }
+
+        .toggle-text span {
+            color: #3498db;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .toggle-text span:hover {
+            text-decoration: underline;
+        }
+
+        .error-msg {
+            background-color: #fdeaea;
+            color: #e74c3c;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #fad2d2;
+            text-align: center;
+        }
+
+        .success-msg {
+            background-color: #eafaf1;
+            color: #27ae60;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #d5f5e3;
+            text-align: center;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8f9fa;
+            padding: 15px 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border: 1px solid #eee;
+        }
+
+        .user-greeting {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .add-book-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            flex-wrap: wrap;
+        }
+
+        .add-book-form input,
+        .add-book-form select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .add-book-form button {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        .add-book-form button:hover {
+            background-color: #219a52;
+        }
+
+        .book-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .book-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            background: white;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .book-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .book-info h3 {
+            margin: 0 0 5px 0;
+            color: #2c3e50;
+        }
+
+        .book-info p {
+            margin: 0;
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+
+        .book-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .status-select {
+            padding: 6px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            background-color: #f8f9fa;
+        }
+
+        .btn-delete {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .btn-delete:hover {
+            background-color: #c0392b;
+        }
+
+        .status-read {
+            border-left: 4px solid #27ae60;
+        }
+
+        .status-wishlist {
+            border-left: 4px solid #f39c12;
+        }
+
+        .status-unread {
+            border-left: 4px solid #3498db;
+        }
+
+        .status-abandoned {
+            border-left: 4px solid #95a5a6;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        function App() {
+            const [users, setUsers] = useState(() => {
+                const savedUsers = localStorage.getItem('libraryAppUsers');
+                return savedUsers ? JSON.parse(savedUsers) : [];
+            });
+
+            const [currentUser, setCurrentUser] = useState(() => {
+                const sessionUser = localStorage.getItem('libraryCurrentSession');
+                return sessionUser ? JSON.parse(sessionUser) : null;
+            });
+
+            const [view, setView] = useState(() => {
+                const sessionUser = localStorage.getItem('libraryCurrentSession');
+                return sessionUser ? 'library' : 'login';
+            });
+
+            const [books, setBooks] = useState(() => {
+                const savedBooks = localStorage.getItem('libraryBooks');
+                if (savedBooks) {
+                    return JSON.parse(savedBooks);
+                }
+                return [
+                    { id: 1, title: "1984", author: "Джордж Оруелл", status: "read" },
+                    { id: 2, title: "Володар перснів", author: "Дж.Р.Р. Толкін", status: "wishlist" }
+                ];
+            });
+
+            useEffect(() => {
+                localStorage.setItem('libraryAppUsers', JSON.stringify(users));
+            }, [users]);
+
+            useEffect(() => {
+                if (currentUser) {
+                    localStorage.setItem('libraryCurrentSession', JSON.stringify(currentUser));
+                } else {
+                    localStorage.removeItem('libraryCurrentSession');
+                }
+            }, [currentUser]);
+
+            useEffect(() => {
+                localStorage.setItem('libraryBooks', JSON.stringify(books));
+            }, [books]);
+
+            const [authForm, setAuthForm] = useState({ name: '', email: '', password: '' });
+            const [errorMsg, setErrorMsg] = useState('');
+            const [successMsg, setSuccessMsg] = useState('');
+
+            const handleAuthChange = (e) => {
+                setAuthForm({ ...authForm, [e.target.name]: e.target.value });
+                setErrorMsg('');
+                setSuccessMsg('');
+            };
+
+            const handleRegister = (e) => {
+                e.preventDefault();
+                if (!authForm.name || !authForm.email || !authForm.password) {
+                    setErrorMsg("Будь ласка, заповніть усі поля.");
+                    return;
+                }
+                const existingUser = users.find(u => u.email === authForm.email);
+                if (existingUser) {
+                    setErrorMsg("Користувач з таким Email вже існує!");
+                    return;
+                }
+
+                const newUser = { id: Date.now(), name: authForm.name, email: authForm.email, password: authForm.password };
+                setUsers([...users, newUser]);
+                setSuccessMsg("Реєстрація успішна! Тепер ви можете увійти.");
+                setTimeout(() => setView('login'), 1500);
+                setAuthForm({ name: '', email: '', password: '' });
+            };
+
+            const handleLogin = (e) => {
+                e.preventDefault();
+                const user = users.find(u => u.email === authForm.email && u.password === authForm.password);
+                if (user) {
+                    setCurrentUser(user);
+                    setView('library');
+                    setAuthForm({ name: '', email: '', password: '' });
+                } else {
+                    setErrorMsg("Невірний Email або пароль!");
+                }
+            };
+
+            const handleLogout = () => {
+                setCurrentUser(null);
+                setView('login');
+            };
+
+            const [newTitle, setNewTitle] = useState("");
+            const [newAuthor, setNewAuthor] = useState("");
+            const [newStatus, setNewStatus] = useState("wishlist");
+
+            const handleAddBook = (e) => {
+                e.preventDefault();
+                if (!newTitle.trim() || !newAuthor.trim()) return;
+
+                const newBook = { id: Date.now(), title: newTitle, author: newAuthor, status: newStatus };
+                setBooks([...books, newBook]);
+                setNewTitle(""); setNewAuthor(""); setNewStatus("wishlist");
+            };
+
+            const handleExportJSON = () => {
+                const libraryData = {
+                    name: "Моя цифрова бібліотека",
+                    owner: currentUser ? currentUser.name : "Невідомий",
+                    createdAt: new Date().toISOString(),
+                    books: books
+                };
+                const jsonString = JSON.stringify(libraryData, null, 2);
+                const dataBlob = new Blob([jsonString], { type: 'application/json' });
+                const url = URL.createObjectURL(dataBlob);
+                const downloadLink = document.createElement('a');
+                downloadLink.href = url;
+                downloadLink.download = `${(currentUser && currentUser.name) || 'my'}_LibraryData.json`;
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+                URL.revokeObjectURL(url);
+            };
+
+            const [profileForm, setProfileForm] = useState({ name: '', email: '', oldPassword: '', newPassword: '' });
+
+            useEffect(() => {
+                if (currentUser && view === 'profile') {
+                    setProfileForm({ name: currentUser.name, email: currentUser.email, oldPassword: '', newPassword: '' });
+                    setErrorMsg(''); setSuccessMsg('');
+                }
+            }, [view, currentUser]);
+
+            const handleProfileUpdate = (e) => {
+                e.preventDefault();
+                if (profileForm.name !== currentUser.name || profileForm.email !== currentUser.email) {
+                    const emailExists = users.find(u => u.email === profileForm.email && u.id !== currentUser.id);
+                    if (emailExists) {
+                        setErrorMsg("Цей Email вже використовується іншим користувачем.");
+                        return;
+                    }
+                    const updatedUser = { ...currentUser, name: profileForm.name, email: profileForm.email };
+                    setUsers(users.map(u => u.id === currentUser.id ? updatedUser : u));
+                    setCurrentUser(updatedUser);
+                    setSuccessMsg("Особисті дані успішно оновлено!");
+                }
+
+                if (profileForm.newPassword) {
+                    if (profileForm.oldPassword !== currentUser.password) {
+                        setErrorMsg("Поточний пароль введено неправильно!");
+                        return;
+                    }
+                    if (profileForm.newPassword.length < 4) {
+                        setErrorMsg("Новий пароль має бути не менше 4 символів!");
+                        return;
+                    }
+
+                    const updatedUserWithPass = { ...currentUser, password: profileForm.newPassword, name: profileForm.name, email: profileForm.email };
+                    setUsers(users.map(u => u.id === currentUser.id ? updatedUserWithPass : u));
+                    setCurrentUser(updatedUserWithPass);
+                    setSuccessMsg("Пароль успішно змінено!");
+                    setProfileForm({ ...profileForm, oldPassword: '', newPassword: '' });
+                }
+            };
+
+            if (view === 'login' || view === 'register') {
+                return (
+                    <div className="auth-container">
+                        <h1>📚 {view === 'login' ? 'Вхід в Бібліотеку' : 'Реєстрація'}</h1>
+
+                        {errorMsg && <div className="error-msg">{errorMsg}</div>}
+                        {successMsg && <div className="success-msg">{successMsg}</div>}
+
+                        <form onSubmit={view === 'login' ? handleLogin : handleRegister}>
+                            {view === 'register' && (
+                                <div className="form-group">
+                                    <label>Повне ім'я</label>
+                                    <input type="text" name="name" value={authForm.name} onChange={handleAuthChange} placeholder="Іван Іваненко" required />
+                                </div>
+                            )}
+
+                            <div className="form-group">
+                                <label>Email адреса</label>
+                                <input type="email" name="email" value={authForm.email} onChange={handleAuthChange} placeholder="email@example.com" required />
+                            </div>
+
+                            <div className="form-group">
+                                <label>Пароль</label>
+                                <input type="password" name="password" value={authForm.password} onChange={handleAuthChange} placeholder="••••••••" required />
+                            </div>
+
+                            <button type="submit" className="btn-primary">
+                                {view === 'login' ? 'Увійти' : 'Створити акаунт'}
+                            </button>
+                        </form>
+
+                        <div className="toggle-text">
+                            {view === 'login' ? (
+                                <p>Ще немає акаунта? <span onClick={() => { setView('register'); setErrorMsg(''); setSuccessMsg(''); }}>Зареєструватись</span></p>
+                            ) : (
+                                <p>Вже є акаунт? <span onClick={() => { setView('login'); setErrorMsg(''); setSuccessMsg(''); }}>Увійти</span></p>
+                            )}
+                        </div>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="app-container">
+                    <div className="navbar">
+                        <div className="user-greeting">
+                            👋 Вітаємо, {currentUser.name}!
+                        </div>
+                        <div className="nav-actions">
+                            {view === 'library' ? (
+                                <button className="btn-secondary" onClick={() => setView('profile')}>👤 Мій Профіль</button>
+                            ) : (
+                                <button className="btn-secondary" onClick={() => setView('library')}>📚 Бібліотека</button>
+                            )}
+                            <button className="btn-secondary" style={{ color: '#e74c3c' }} onClick={handleLogout}>🚪 Вийти</button>
+                        </div>
+                    </div>
+
+                    {view === 'library' && (
+                        <div>
+                            <h2>Моя Бібліотека</h2>
+
+                            <form className="add-book-form" onSubmit={handleAddBook}>
+                                <input type="text" placeholder="Назва книги..." value={newTitle} onChange={(e) => setNewTitle(e.target.value)} required />
+                                <input type="text" placeholder="Автор..." value={newAuthor} onChange={(e) => setNewAuthor(e.target.value)} required />
+                                <select value={newStatus} onChange={(e) => setNewStatus(e.target.value)}>
+                                    <option value="wishlist">У списку бажань</option>
+                                    <option value="unread">Читаю зараз</option>
+                                    <option value="read">Прочитано</option>
+                                    <option value="abandoned">Покинуто</option>
+                                </select>
+                                <button type="submit">Додати</button>
+                            </form>
+
+                            <div style={{ marginBottom: '20px', textAlign: 'right' }}>
+                                <button onClick={handleExportJSON} style={{ backgroundColor: '#27ae60', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '6px', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '8px', fontWeight: 'bold' }}>
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                        <polyline points="7 10 12 15 17 10"></polyline>
+                                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                                    </svg>
+                                    Завантажити JSON
+                                </button>
+                            </div>
+
+                            <div className="book-list">
+                                {books.length === 0 ? (
+                                    <p style={{ textAlign: 'center', color: '#7f8c8d' }}>Ваша бібліотека порожня. Додайте першу книгу!</p>
+                                ) : (
+                                    books.map(book => (
+                                        <div key={book.id} className={`book-card status-${book.status}`}>
+                                            <div className="book-info">
+                                                <h3>{book.title}</h3>
+                                                <p>{book.author}</p>
+                                            </div>
+
+                                            <div className="book-actions">
+                                                <select
+                                                    className="status-select"
+                                                    value={book.status}
+                                                    onChange={(e) => {
+                                                        const targetStatus = e.target.value;
+                                                        setBooks(books.map(b => b.id === book.id ? { ...b, status: targetStatus } : b));
+                                                    }}
+                                                >
+                                                    <option value="wishlist">У списку бажань</option>
+                                                    <option value="unread">Читаю зараз</option>
+                                                    <option value="read">Прочитано</option>
+                                                    <option value="abandoned">Покинуто</option>
+                                                </select>
+
+                                                <button className="btn-delete" onClick={() => setBooks(books.filter(b => b.id !== book.id))}>
+                                                    Видалити
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        </div>
+                    )}
+
+                    {view === 'profile' && (
+                        <div>
+                            <h2>Управління Профілем</h2>
+                            <p style={{ textAlign: 'center', color: '#7f8c8d', marginBottom: '25px' }}>Тут ви можете змінити свої особисті дані та пароль.</p>
+
+                            {errorMsg && <div className="error-msg">{errorMsg}</div>}
+                            {successMsg && <div className="success-msg">{successMsg}</div>}
+
+                            <form onSubmit={handleProfileUpdate} style={{ maxWidth: '500px', margin: '0 auto', background: '#f8f9fa', padding: '25px', borderRadius: '12px' }}>
+                                <div className="form-group">
+                                    <label>Змінити Ім'я</label>
+                                    <input type="text" name="name" value={profileForm.name} onChange={(e) => setProfileForm({ ...profileForm, name: e.target.value })} required />
+                                </div>
+                                <div className="form-group">
+                                    <label>Змінити Email</label>
+                                    <input type="email" name="email" value={profileForm.email} onChange={(e) => setProfileForm({ ...profileForm, email: e.target.value })} required />
+                                </div>
+
+                                <hr style={{ border: 'none', borderTop: '1px solid #ddd', margin: '20px 0' }} />
+
+                                <h3 style={{ marginBottom: '15px', color: '#2c3e50', fontSize: '1.1em' }}>Редагування пароля</h3>
+                                <div className="form-group">
+                                    <label>Поточний пароль (потрібен лише для зміни пароля)</label>
+                                    <input type="password" name="oldPassword" value={profileForm.oldPassword} onChange={(e) => setProfileForm({ ...profileForm, oldPassword: e.target.value })} placeholder="••••••••" />
+                                </div>
+                                <div className="form-group">
+                                    <label>Новий пароль</label>
+                                    <input type="password" name="newPassword" value={profileForm.newPassword} onChange={(e) => setProfileForm({ ...profileForm, newPassword: e.target.value })} placeholder="••••••••" />
+                                </div>
+
+                                <button type="submit" className="btn-primary" style={{ marginTop: '10px' }}>
+                                    Зберегти зміни
+                                </button>
+                            </form>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+
+</html>
