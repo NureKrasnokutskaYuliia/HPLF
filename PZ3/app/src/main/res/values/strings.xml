@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">ПЗ3</string>
+    <string name="nav_age">Вік</string>
+    <string name="nav_seconds">Секунди</string>
+    <string name="nav_rps">Гра</string>
+    <string name="nav_prime">Прості</string>
+</resources>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/nav_age"
+        android:icon="@drawable/ic_nav_age"
+        android:title="@string/nav_age" />
+
+    <item
+        android:id="@+id/nav_seconds"
+        android:icon="@drawable/ic_nav_seconds"
+        android:title="@string/nav_seconds" />
+
+    <item
+        android:id="@+id/nav_rps"
+        android:icon="@drawable/ic_nav_rps"
+        android:title="@string/nav_rps" />
+
+    <item
+        android:id="@+id/nav_prime"
+        android:icon="@drawable/ic_nav_prime"
+        android:title="@string/nav_prime" />
+
+</menu>
